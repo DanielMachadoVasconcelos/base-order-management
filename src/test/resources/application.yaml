@@ -1,0 +1,5 @@
+docker:
+  compose:
+    lifecycle-management: ${DOCKER_COMPOSE_LIFECYCLE_MANAGEMENT:START_AND_STOP}
+    skip:
+      in-tests: false

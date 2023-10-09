@@ -1,0 +1,39 @@
+spring:
+  pulsar:
+    defaults:
+      type-mappings:
+        - message-type: br.ead.base.order.Order
+          schema-info:
+            schema-type: JSON
+    client:
+      service-url: pulsar://localhost:6650
+  profiles:
+    active: local
+
+jackson:
+  property-naming-strategy: SNAKE_CASE
+
+management:
+  metrics:
+    tags:
+      application: "order-management"
+
+  endpoints:
+    jmx:
+      exposure:
+        include: '*'
+    enabled-by-default: true
+    web:
+      exposure:
+        include: 'health, metrics, info, prometheus'
+
+
+logging:
+  config: classpath:logback-spring.xml
+
+aws:
+  dynamodb:
+    accessKey: accessKey
+    secretKey: secretKey
+    endpoint: http://localhost:8000
+    region: ap-south-1

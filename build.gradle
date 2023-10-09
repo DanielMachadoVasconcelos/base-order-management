@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '3.2.0-SNAPSHOT'
     id 'io.spring.dependency-management' version '1.1.3'
     id 'org.graalvm.buildtools.native' version '0.9.27'
@@ -9,7 +10,17 @@ group = 'br.ead.base.ordermanagement'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '17'
+}
+
+
+graalvmNative {
+
+    binaries {
+        main {
+            buildArgs.add('--enable-preview')
+        }
+    }
 }
 
 configurations {
@@ -20,6 +31,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven { url 'https://repo.spring.io/milestone' }
     maven { url 'https://repo.spring.io/snapshot' }
 }
@@ -27,15 +39,44 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-pulsar'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'net.datafaker:datafaker:2.0.2'
+
+    // https://mvnrepository.com/artifact/software.amazon.awssdk/dynamodb-enhanced
+    implementation 'software.amazon.awssdk:dynamodb-enhanced:2.20.162'
+
 }
 
-tasks.named('test') {
+
+test {
     useJUnitPlatform()
+    testLogging {
+        events "skipped", "failed"
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        xml.required = true
+        csv.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: '**/generated/**')
+        }))
+    }
 }

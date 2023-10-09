@@ -1,7 +1,19 @@
+version: '3'
 services:
-  pulsar:
+  order_management_pulsar:
     image: 'apachepulsar/pulsar:3.1.0'
+    container_name: 'order_management_pulsar'
     ports:
-      - '6650'
-      - '8080'
+      - '6650:6650'
+      - '8080:8080'
     command: 'bin/pulsar standalone'
+
+  order_management_dynamodb:
+    image: localstack/localstack
+    container_name: 'order_management_dynamodb'
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=dynamodb
+      - DEFAULT_REGION=us-east-1
+      - DATA_DIR=/tmp/localstack/data

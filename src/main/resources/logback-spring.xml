@@ -1,0 +1,28 @@
+<configuration>
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %magenta(%d{HH:mm:ss.SSS}) %highlight(%-5level) [%cyan(%t)] %yellow(%C{1}) - %msg %mdc%n%throwable
+            </pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <logger name="org.springframework.boot.autoconfigure" level="ERROR"/>
+
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+        </root>
+    </springProfile>
+    <springProfile name="!local">
+        <root level="INFO">
+            <appender-ref ref="JSON_STDOUT"/>
+        </root>
+    </springProfile>
+
+</configuration>
